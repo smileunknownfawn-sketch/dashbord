@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111713" />
+  <meta name="description" content="Дашборд контролю виконання розпоряджень" />
+  <title>Контроль виконання розпоряджень</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true">
+    <div class="grain"></div>
+    <div class="grid"></div>
+    <div class="crest-mark">UA</div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">✦</div>
+      <div>
+        <div class="eyebrow">ЗБРОЙНІ СИЛИ УКРАЇНИ</div>
+        <h1>КОНТРОЛЬ ВИКОНАННЯ <span>РОЗПОРЯДЖЕНЬ</span></h1>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <div class="live-dot"><i></i> СИСТЕМА АКТИВНА</div>
+      <div id="currentDate" class="current-date"></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero-row">
+      <div>
+        <div class="section-kicker">ОПЕРАТИВНИЙ КОНТРОЛЬ</div>
+        <h2>Процес виконання <em>розпоряджень</em></h2>
+        <p class="subtitle">Єдиний реєстр документів, контроль термінів та швидкий доступ до тексту розпорядження.</p>
+      </div>
+      <button class="primary-btn" id="addBtn"><span>＋</span> ДОДАТИ РОЗПОРЯДЖЕННЯ</button>
+    </section>
+
+    <section class="stats" id="stats">
+      <article class="stat-card"><div class="stat-icon">▤</div><div><span>УСЬОГО</span><strong id="totalCount">0</strong></div></article>
+      <article class="stat-card warning"><div class="stat-icon">◷</div><div><span>У РОБОТІ</span><strong id="progressCount">0</strong></div></article>
+      <article class="stat-card danger"><div class="stat-icon">!</div><div><span>ПРОСТРОЧЕНО</span><strong id="overdueCount">0</strong></div></article>
+      <article class="stat-card success"><div class="stat-icon">✓</div><div><span>ВИКОНАНО</span><strong id="doneCount">0</strong></div></article>
+    </section>
+
+    <section class="workspace">
+      <div class="toolbar">
+        <label class="searchbox"><span>⌕</span><input id="searchInput" type="search" placeholder="Пошук за номером або описом..." /></label>
+        <div class="filters" role="group" aria-label="Фільтр статусу">
+          <button class="filter active" data-filter="all">Усі</button>
+          <button class="filter" data-filter="progress">У роботі</button>
+          <button class="filter" data-filter="overdue">Прострочені</button>
+          <button class="filter" data-filter="done">Виконані</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>№ РОЗПОРЯДЖЕННЯ</th><th>ТЕРМІН</th><th>КОРОТКИЙ ЗМІСТ</th><th>СТАТУС</th><th></th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-mark">＋</div>
+          <h3>Розпоряджень ще немає</h3>
+          <p>Додайте перше розпорядження, щоб сформувати реєстр.</p>
+          <button class="secondary-btn" id="emptyAddBtn">ДОДАТИ РОЗПОРЯДЖЕННЯ</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note"><span>ЗАХИЩЕНИЙ РОБОЧИЙ ІНТЕРФЕЙС</span><span>•</span><span>ЛОКАЛЬНЕ ЗБЕРІГАННЯ ДАНИХ У ЦЬОМУ БРАУЗЕРІ</span></div>
+  </main>
+
+  <dialog id="orderDialog" class="dialog">
+    <form method="dialog" id="orderForm" class="dialog-card">
+      <button type="button" class="close-btn" id="closeDialog" aria-label="Закрити">×</button>
+      <div class="dialog-kicker">НОВИЙ ЗАПИС</div>
+      <h2>Додати розпорядження</h2>
+      <p class="dialog-subtitle">Заповніть основні реквізити та прикріпіть файл документа.</p>
+
+      <div class="form-grid">
+        <label><span>№ РОЗПОРЯДЖЕННЯ *</span><input id="orderNumber" required placeholder="Наприклад: 27/2026" /></label>
+        <label><span>КІНЦЕВИЙ ТЕРМІН *</span><input id="deadline" required type="date" /></label>
+      </div>
+      <label><span>ЩО ПОТРІБНО ВИКОНАТИ *</span><textarea id="description" required rows="4" placeholder="Коротко сформулюйте завдання..."></textarea></label>
+
+      <div class="file-drop" id="fileDrop">
+        <input id="fileInput" type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" hidden />
+        <div class="file-icon">⌁</div>
+        <div><strong id="fileTitle">Перетягніть файл сюди або оберіть його</strong><small>PDF, DOC, DOCX, TXT, JPG, PNG</small></div>
+        <button type="button" class="choose-btn" id="chooseFile">ОБРАТИ ФАЙЛ</button>
+      </div>
+      <div class="file-error" id="fileError"></div>
+
+      <div class="dialog-actions"><button type="button" class="ghost-btn" id="cancelBtn">СКАСУВАТИ</button><button type="submit" class="primary-btn">ЗБЕРЕГТИ РОЗПОРЯДЖЕННЯ</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="viewerDialog" class="viewer-dialog">
+    <div class="viewer-shell">
+      <header class="viewer-header"><div><span class="dialog-kicker">ДОКУМЕНТ</span><h2 id="viewerTitle"></h2></div><button class="close-btn" id="closeViewer">×</button></header>
+      <div class="viewer-meta" id="viewerMeta"></div>
+      <div class="viewer-content" id="viewerContent"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
