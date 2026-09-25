@@ -1,5 +1,5 @@
 from __future__ import annotations
-import html, mimetypes, os, sqlite3, subprocess, sys
+import html, mimetypes, os, sqlite3, subprocess, sys, base64
 from datetime import date, datetime
 from pathlib import Path
 import streamlit as st
@@ -15,11 +15,13 @@ ORDERS=WORK/'Розпорядження'; ORDERS.mkdir(exist_ok=True)
 DB=WORK/'database.db'
 CSS='''<style>@import url(https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap);html,body,[class*=css]{font-family:Inter,sans-serif}.stApp{background:linear-gradient(135deg,#07100a,#1b291d 48%,#060906);color:#edf2ec}.block-container{max-width:1450px;padding:2rem 3rem}.hero h1{font-family:Manrope,sans-serif;font-style:normal;font-weight:800;font-size:clamp(2rem,4vw,3.5rem);letter-spacing:-.04em}.eyebrow{color:#b1c79e;font-weight:800;font-size:.65rem;letter-spacing:.2em}.version{text-align:right;color:#89958c;font-size:.68rem;letter-spacing:.12em;font-weight:700}.panel,.order,.metric{background:#09120de8;border:1px solid #dce9d91e;border-radius:14px;padding:1rem}.order{margin:.7rem 0;border-left:5px solid #d0ae62}.order.overdue{border-left-color:#e16f68}.order.done{border-left-color:#78b589}.desc{color:#bdc7be;margin:.5rem 0;line-height:1.5}.muted{color:#7f8b83;font-size:.7rem;letter-spacing:.07em}.badge{padding:.3rem .55rem;border-radius:99px;font-size:.62rem;font-weight:800}.work{color:#d0ae62;background:#d0ae6218}.late{color:#e16f68;background:#e16f6818}.finished{color:#78b589;background:#78b58918}.stButton>button{border-radius:8px;background:#78925f20;border:1px solid #a9bc9140;color:#d7e2d0;font-weight:800}.successbox{padding:18px;border:1px solid #9ab58a55;border-radius:14px;background:#263d2a}.stTextInput input,.stTextArea textarea{background:#0004!important;color:#fff!important}</style>'''
 st.markdown(CSS,unsafe_allow_html=True)
+
 def db():
  c=sqlite3.connect(DB); c.row_factory=sqlite3.Row
  c.execute('''CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY AUTOINCREMENT,number TEXT,deadline TEXT,description TEXT,folder TEXT,filename TEXT,path TEXT,mime TEXT,status TEXT DEFAULT 'progress',completion_outgoing TEXT DEFAULT '',created_at TEXT)''')
  c.execute('''CREATE TABLE IF NOT EXISTS responses(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER,response_date TEXT,outgoing TEXT,comment TEXT,filename TEXT,path TEXT,mime TEXT,is_final INTEGER DEFAULT 0,created_at TEXT)''')
  c.commit(); return c
+
 def safe(s): return ''.join(x if x.isalnum() or x in ' ._-()[]' else '_' for x in str(s)).strip() or 'Документ'
 def copy_upload(f,folder):
  folder.mkdir(parents=True,exist_ok=True); p=folder/safe(f.name); i=2
@@ -37,7 +39,6 @@ def open_file(path):
  except Exception as e: st.error(f'Не вдалося відкрити файл: {e}')
 def audio(path):
  if not path.exists(): return
- import base64
  b=base64.b64encode(path.read_bytes()).decode()
  st.markdown(f'<audio autoplay><source src="data:audio/mpeg;base64,{b}" type="audio/mpeg"></audio>',unsafe_allow_html=True)
 def add_order(n,d,desc,f):
@@ -48,16 +49,20 @@ def add_response(r,d,out,comment,f,final):
  folder=ORDERS/r['folder']/'Відповіді'; p=copy_upload(f,folder); c=db(); c.execute('INSERT INTO responses(order_id,response_date,outgoing,comment,filename,path,mime,is_final,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)',(r['id'],d.isoformat(),out,comment,p.name,str(p.relative_to(WORK)),f.type or 'application/octet-stream',int(final),datetime.now().isoformat()))
  if final:c.execute("UPDATE orders SET status='done',completion_outgoing=? WHERE id=?",(out,r['id']))
  c.commit();c.close()
+
 c=db()
 if c.execute('SELECT COUNT(*) FROM orders').fetchone()[0]==0:
  folder=ORDERS/'01-2026';folder.mkdir(exist_ok=True);p=folder/'Розпорядження_01-2026.txt';p.write_text('ДЕМОНСТРАЦІЙНЕ РОЗПОРЯДЖЕННЯ\n\nПідготувати та надати узагальнену інформацію про стан виконання визначених завдань.',encoding='utf-8');c.execute('INSERT INTO orders(number,deadline,description,folder,filename,path,mime,status,created_at) VALUES(?,?,?,?,?,?,?,?,?)',('01/2026','2026-10-05','Підготувати та надати узагальнену інформацію про стан виконання визначених завдань.',folder.name,p.name,str(p.relative_to(WORK)),'text/plain','progress',datetime.now().isoformat()));c.commit()
 rows=c.execute('SELECT * FROM orders ORDER BY deadline').fetchall();c.close()
+
 l,r=st.columns([4,1])
 with l:
  lang=st.selectbox('Мова інтерфейсу',['Українська','Російська'],index=0 if st.session_state.lang=='Українська' else 1,label_visibility='collapsed');st.session_state.lang=lang
  st.markdown(f'<div class="muted">Мова інтерфейсу — <b>{lang}</b></div>',unsafe_allow_html=True)
 with r:st.markdown('<div class="version">ВЕРСІЯ 1.0.1</div>',unsafe_allow_html=True)
-if lang=='Російська': st.warning('Ти що, москаль? 😄')
+if lang=='Російська':
+ st.components.v1.html('''<html><body style="margin:0;background:#050807;color:#f1df8d;font-family:Arial,sans-serif;text-align:center;overflow:hidden"><h2 style="margin:0 0 10px;font-size:30px;font-weight:800">Ти що москать?</h2><img src="https://raw.githubusercontent.com/smileunknownfawn-sketch/dashbord/main/language-russian.jpg" style="width:100%;max-width:640px;height:auto;border-radius:12px;display:block;margin:auto"><script>setTimeout(()=>document.body.innerHTML='',3500)</script></body></html>''',height=410)
+
 st.markdown('<div class="eyebrow">ЗБРОЙНІ СИЛИ УКРАЇНИ</div><div class="hero"><h1>Процес виконання розпоряджень</h1><p class="muted">Контроль термінів, документів та відповідей у єдиному робочому просторі.</p></div>',unsafe_allow_html=True)
 if st.button('＋ ДОДАТИ РОЗПОРЯДЖЕННЯ'):st.session_state.add_open=not st.session_state.add_open;st.rerun()
 if st.session_state.add_open:
@@ -75,6 +80,7 @@ if st.session_state.add_open:
 if st.session_state.pop('just_added',False):
  st.markdown('<div class="successbox"><b>РОЗПОРЯДЖЕННЯ ДОДАНО</b><br><span class="muted">Опять работа? 😄</span></div>',unsafe_allow_html=True)
  audio(APP/'opiat-rabota.mp3')
+
 c=db();rows=c.execute('SELECT * FROM orders ORDER BY deadline').fetchall();c.close();counts={'progress':0,'overdue':0,'done':0}
 for r in rows:counts[state(r)]+=1
 for col,label,val in zip(st.columns(4),['УСЬОГО','У РОБОТІ','ПРОСТРОЧЕНО','ВИКОНАНО'],[len(rows),counts['progress'],counts['overdue'],counts['done']]):
