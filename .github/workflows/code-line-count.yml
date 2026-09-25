@@ -1,9 +1,12 @@
-name: Підрахунок рядків
+name: Точний підрахунок рядків
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   count:
@@ -14,11 +17,23 @@ jobs:
       - name: Порахувати рядки
         shell: bash
         run: |
-          echo "=== КІЛЬКІСТЬ РЯДКІВ ==="
           total=0
+          : > LINE_COUNT.md
+          echo "# Точний підрахунок рядків" >> LINE_COUNT.md
+          echo >> LINE_COUNT.md
+          echo "Автоматично сформовано GitHub Actions." >> LINE_COUNT.md
+          echo >> LINE_COUNT.md
+          echo '| Файл | Рядків |' >> LINE_COUNT.md
+          echo '|---|---:|' >> LINE_COUNT.md
           while IFS= read -r file; do
             lines=$(wc -l < "$file")
-            printf '%6s  %s\n' "$lines" "$file"
+            printf '| `%s` | %s |\n' "${file#./}" "$lines" >> LINE_COUNT.md
             total=$((total + lines))
-          done < <(find . -type f \( -name '*.py' -o -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.md' -o -name '*.txt' -o -name '*.yml' -o -name '*.yaml' \) -not -path './.git/*' | sort)
-          echo "TOTAL_LINES=$total"
+          done < <(find . -type f \( -name '*.py' -o -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.md' -o -name '*.txt' -o -name '*.yml' -o -name '*.yaml' \) -not -path './.git/*' -not -path './LINE_COUNT.md' | sort)
+          echo >> LINE_COUNT.md
+          echo "**РАЗОМ: $total рядків**" >> LINE_COUNT.md
+      - name: Зберегти результат
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: LINE_COUNT.md
+          message: "Автоматично оновити точний підрахунок рядків"
