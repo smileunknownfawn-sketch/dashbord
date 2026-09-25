@@ -5,9 +5,6 @@ from pathlib import Path
 
 import streamlit as st
 
-
-# Внутрішні назви БД залишаються технічними, але користувачеві вони ніколи
-# не повинні показуватися як id, number, deadline, status тощо.
 _DISPLAY_NAMES = {
     "id": "Ідентифікатор",
     "number": "Номер",
@@ -38,7 +35,7 @@ _DISPLAY_NAMES = {
 
 
 def _ukrainian_dataframe(data):
-    """Повертає копію табличних даних із людськими українськими заголовками."""
+    """Не показувати користувачу технічні назви полів бази даних."""
     try:
         import pandas as pd
         if isinstance(data, pd.DataFrame):
@@ -67,6 +64,12 @@ from app_v3 import main
 if __name__ == "__main__":
     try:
         main()
+        st.markdown(
+            '<div style="text-align:center;color:#69766d;font-size:.63rem;letter-spacing:.08em;padding:1rem 0 2rem">'
+            'РОЗРОБНИК: В.О.М. · ВЕРСІЯ 1.0.1 · ЛОКАЛЬНИЙ РЕЖИМ'
+            '</div>',
+            unsafe_allow_html=True,
+        )
     except Exception:
         log_dir = Path(__file__).resolve().parent / "data"
         log_dir.mkdir(parents=True, exist_ok=True)
