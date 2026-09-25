@@ -1,0 +1,24 @@
+name: Final validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Отримати код
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Встановити залежності
+        run: pip install -r requirements.txt pytest
+      - name: Синтаксична перевірка
+        run: python -m compileall -q .
+      - name: Unit-тести
+        run: pytest -q
