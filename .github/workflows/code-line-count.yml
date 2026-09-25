@@ -1,0 +1,24 @@
+name: Підрахунок рядків
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Отримати репозиторій
+        uses: actions/checkout@v4
+      - name: Порахувати рядки
+        shell: bash
+        run: |
+          echo "=== КІЛЬКІСТЬ РЯДКІВ ==="
+          total=0
+          while IFS= read -r file; do
+            lines=$(wc -l < "$file")
+            printf '%6s  %s\n' "$lines" "$file"
+            total=$((total + lines))
+          done < <(find . -type f \( -name '*.py' -o -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.md' -o -name '*.txt' -o -name '*.yml' -o -name '*.yaml' \) -not -path './.git/*' | sort)
+          echo "TOTAL_LINES=$total"
