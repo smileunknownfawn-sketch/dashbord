@@ -9,6 +9,9 @@ PRIORITIES = ["Звичайний", "Важливий", "Терміновий", 
 CATEGORIES = ["Організаційне", "Особовий склад", "Матеріальне", "Навчання", "Бойова підготовка", "Документація", "Інше"]
 STATUSES = {"progress": "У РОБОТІ", "today": "ТЕРМІН СЬОГОДНІ", "overdue": "ПРОСТРОЧЕНО", "done": "ВИКОНАНО"}
 
+APP_VERSION = "1.0.1"
+APP_TITLE = "Процес виконання розпоряджень"
+DEVELOPER = "В.О.М."
 
 @dataclass(frozen=True)
 class AppPaths:
@@ -28,7 +31,3 @@ class AppPaths:
     def ensure(self) -> None:
         for path in (self.root, self.orders, self.backups, self.trash, self.exports):
             path.mkdir(parents=True, exist_ok=True)
-
-
-APP_VERSION = "3.0.0"
-APP_TITLE = "Процес виконання розпоряджень"
