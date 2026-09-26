@@ -16,6 +16,7 @@ SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=admin
 Uninstallable=yes
+DisableProgramGroupPage=yes
 
 [Languages]
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
@@ -30,9 +31,40 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 
 [UninstallDelete]
-; Робочі дані навмисно не видаляються. Вони знаходяться поза папкою програми.
 Type: filesandordirs; Name: "{app}\sounds"
 Type: filesandordirs; Name: "{app}\assets"
 
 [Run]
-Filename: "{app}\{#AppExeName}"; Description: "Запустити {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}"; Parameters: "/datafolder=""{code:DataDir}"""; Description: "Запустити {#AppName}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+var
+  DataDirPage: TInputDirWizardPage;
+
+procedure InitializeWizard;
+begin
+  DataDirPage := CreateInputDirPage(wpSelectDir,
+    'Папка для даних розпоряджень',
+    'Оберіть, де зберігати розпорядження та всі пов’язані дані',
+    'У цій папці програма створить базу, розпорядження, додатки, відповіді, резервні копії та звіти.',
+    False, 'Дашборд розпоряджень');
+  DataDirPage.Add('Папка даних:');
+  DataDirPage.Values[0] := ExpandConstant('{userdocs}\Дашборд розпоряджень');
+end;
+
+function DataDir(Param: String): String;
+begin
+  Result := DataDirPage.Values[0];
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  Marker: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    Marker := DataDirPage.Values[0];
+    ForceDirectories(Marker);
+    SaveStringToFile(AddBackslash(ExpandConstant('{app}')) + 'data-folder.txt', Marker + #13#10, False);
+  end;
+end;
