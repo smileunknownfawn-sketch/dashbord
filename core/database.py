@@ -8,9 +8,10 @@ from typing import Any, Iterator
 SCHEMA={
 "orders":"""CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY AUTOINCREMENT,number TEXT NOT NULL,deadline TEXT NOT NULL,description TEXT NOT NULL,folder TEXT NOT NULL,filename TEXT NOT NULL,path TEXT NOT NULL,mime TEXT NOT NULL,status TEXT DEFAULT 'progress',completion_outgoing TEXT DEFAULT '',priority TEXT DEFAULT 'Звичайний',responsible TEXT DEFAULT '',category TEXT DEFAULT 'Інше',received_date TEXT DEFAULT '',tags TEXT DEFAULT '',created_at TEXT NOT NULL,updated_at TEXT DEFAULT '',deleted_at TEXT DEFAULT '',deleted_path TEXT DEFAULT '')""",
 "responses":"""CREATE TABLE IF NOT EXISTS responses(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,response_date TEXT NOT NULL,outgoing TEXT DEFAULT '',comment TEXT DEFAULT '',filename TEXT NOT NULL,path TEXT NOT NULL,mime TEXT NOT NULL,is_final INTEGER DEFAULT 0,created_at TEXT NOT NULL)""",
+"attachments":"""CREATE TABLE IF NOT EXISTS attachments(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,response_id INTEGER DEFAULT 0,filename TEXT NOT NULL,path TEXT NOT NULL,mime TEXT NOT NULL,created_at TEXT NOT NULL)""",
 "events":"""CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,order_id INTEGER NOT NULL,event_type TEXT NOT NULL,details TEXT DEFAULT '',created_at TEXT NOT NULL)""",
 "settings":"""CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT NOT NULL)"""}
-MIGRATIONS={"orders":{"completion_outgoing":"TEXT DEFAULT ''","priority":"TEXT DEFAULT 'Звичайний'","responsible":"TEXT DEFAULT ''","category":"TEXT DEFAULT 'Інше'","received_date":"TEXT DEFAULT ''","tags":"TEXT DEFAULT ''","updated_at":"TEXT DEFAULT ''","deleted_at":"TEXT DEFAULT ''","deleted_path":"TEXT DEFAULT ''"},"responses":{"is_final":"INTEGER DEFAULT 0"}}
+MIGRATIONS={"orders":{"completion_outgoing":"TEXT DEFAULT ''","priority":"TEXT DEFAULT 'Звичайний'","responsible":"TEXT DEFAULT ''","category":"TEXT DEFAULT 'Інше'","received_date":"TEXT DEFAULT ''","tags":"TEXT DEFAULT ''","updated_at":"TEXT DEFAULT ''","deleted_at":"TEXT DEFAULT ''","deleted_path":"TEXT DEFAULT ''"}}
 
 class Database:
     def __init__(self,path:Path): self.path=path; self.initialize()
@@ -28,7 +29,7 @@ class Database:
                 existing={r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
                 for name,definition in columns.items():
                     if name not in existing: conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {definition}")
-            for sql in ("CREATE INDEX IF NOT EXISTS idx_orders_deadline ON orders(deadline)","CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)","CREATE INDEX IF NOT EXISTS idx_orders_responsible ON orders(responsible)","CREATE INDEX IF NOT EXISTS idx_orders_deleted ON orders(deleted_at)","CREATE INDEX IF NOT EXISTS idx_responses_order ON responses(order_id)","CREATE INDEX IF NOT EXISTS idx_events_order ON events(order_id)"): conn.execute(sql)
+            for sql in ("CREATE INDEX IF NOT EXISTS idx_orders_deadline ON orders(deadline)","CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)","CREATE INDEX IF NOT EXISTS idx_orders_responsible ON orders(responsible)","CREATE INDEX IF NOT EXISTS idx_orders_deleted ON orders(deleted_at)","CREATE INDEX IF NOT EXISTS idx_responses_order ON responses(order_id)","CREATE INDEX IF NOT EXISTS idx_attachments_order ON attachments(order_id)","CREATE INDEX IF NOT EXISTS idx_attachments_response ON attachments(response_id)","CREATE INDEX IF NOT EXISTS idx_events_order ON events(order_id)"): conn.execute(sql)
     def execute(self,sql:str,params:tuple[Any,...]=())->int:
         with self.connection() as conn: return int(conn.execute(sql,params).lastrowid or 0)
     def fetchone(self,sql:str,params:tuple[Any,...]=())->sqlite3.Row|None:
@@ -41,6 +42,7 @@ class Database:
     def get_order(self,order_id:int,include_deleted:bool=False)->sqlite3.Row|None:
         where="" if include_deleted else "AND COALESCE(deleted_at,'')=''"; return self.fetchone(f"SELECT * FROM orders WHERE id=? {where}",(order_id,))
     def get_responses(self,order_id:int)->list[sqlite3.Row]: return self.fetchall("SELECT * FROM responses WHERE order_id=? ORDER BY response_date DESC,id DESC",(order_id,))
+    def get_attachments(self,order_id:int,response_id:int=0)->list[sqlite3.Row]: return self.fetchall("SELECT * FROM attachments WHERE order_id=? AND response_id=? ORDER BY id DESC",(order_id,response_id))
     def get_events(self,order_id:int)->list[sqlite3.Row]: return self.fetchall("SELECT * FROM events WHERE order_id=? ORDER BY created_at DESC,id DESC",(order_id,))
     def get_trash(self)->list[sqlite3.Row]: return self.fetchall("SELECT * FROM orders WHERE COALESCE(deleted_at,'')<>'' ORDER BY deleted_at DESC,id DESC")
     def set_setting(self,key:str,value:str)->None: self.execute("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(key,value))
@@ -50,9 +52,7 @@ class Database:
         now=datetime.now().isoformat(timespec="seconds")
         with self.connection() as conn:
             conn.execute("UPDATE orders SET deleted_at=?,deleted_path=?,updated_at=? WHERE id=?",(now,deleted_path,now,order_id)); conn.execute("INSERT INTO events(order_id,event_type,details,created_at) VALUES(?,?,?,?)",(order_id,"Переміщено до кошика","Розпорядження можна відновити",now))
-    def restore_from_trash(self,order_id:int)->None:
-        self.execute("UPDATE orders SET deleted_at='',deleted_path='',updated_at=? WHERE id=?",(datetime.now().isoformat(timespec="seconds"),order_id)); self.log(order_id,"Відновлено","Розпорядження повернуто з кошика")
+    def restore_from_trash(self,order_id:int)->None: self.execute("UPDATE orders SET deleted_at='',deleted_path='',updated_at=? WHERE id=?",(datetime.now().isoformat(timespec="seconds"),order_id)); self.log(order_id,"Відновлено","Розпорядження повернуто з кошика")
     def purge_order(self,order_id:int)->None:
         with self.connection() as conn:
-            conn.execute("DELETE FROM responses WHERE order_id=?",(order_id,)); conn.execute("DELETE FROM events WHERE order_id=?",(order_id,)); conn.execute("DELETE FROM orders WHERE id=?",(order_id,))
-    def remove_trash_record(self,order_id:int)->None: self.purge_order(order_id)
+            conn.execute("DELETE FROM attachments WHERE order_id=?",(order_id,)); conn.execute("DELETE FROM responses WHERE order_id=?",(order_id,)); conn.execute("DELETE FROM events WHERE order_id=?",(order_id,)); conn.execute("DELETE FROM orders WHERE id=?",(order_id,))
