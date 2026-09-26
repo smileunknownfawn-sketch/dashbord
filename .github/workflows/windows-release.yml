@@ -1,0 +1,48 @@
+name: Windows release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test-and-build:
+    runs-on: windows-latest
+    steps:
+      - name: Отримати код
+        uses: actions/checkout@v4
+
+      - name: Встановити Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Встановити інструменти
+        shell: pwsh
+        run: python -m pip install --upgrade pip pytest pyinstaller
+
+      - name: Синтаксична перевірка
+        shell: pwsh
+        run: python -m compileall -q core desktop_final.py
+
+      - name: Автоматичні тести
+        shell: pwsh
+        run: pytest -q
+
+      - name: Зібрати EXE
+        shell: pwsh
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Дашборд_розпоряджень_1.0.1" desktop_final.py
+
+      - name: Перевірити EXE
+        shell: pwsh
+        run: |
+          if (!(Test-Path "dist\Дашборд_розпоряджень_1.0.1.exe")) { throw "EXE не створено" }
+          Get-Item "dist\Дашборд_розпоряджень_1.0.1.exe" | Format-List Name,Length,FullName
+
+      - name: Зберегти EXE як артефакт
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dashbord-Windows-1.0.1
+          path: dist/Дашборд_розпоряджень_1.0.1.exe
+          if-no-files-found: error
