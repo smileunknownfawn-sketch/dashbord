@@ -22,6 +22,10 @@ jobs:
       - name: Синтаксична перевірка
         shell: pwsh
         run: python -m compileall -q core desktop_final.py desktop_modern.py desktop_release.py launcher.py tests
+      - name: Перевірити імпорт і аналітику
+        shell: pwsh
+        run: |
+          python -c "import desktop_release, launcher; from core.analytics import year_comparison, month_comparison; print('Імпорт фінального UI: OK'); print(year_comparison([], 2025, 2026)); print(month_comparison([], 2025, 1, 2026, 1))"
       - name: Підготувати ресурси
         shell: pwsh
         run: |
