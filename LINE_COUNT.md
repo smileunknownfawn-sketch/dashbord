@@ -27,7 +27,7 @@
 | `core/storage.py` | 111 |
 | `core/ui_localization.py` | 39 |
 | `dashboard_engine.py` | 5736 |
-| `desktop_app.py` | 237 |
+| `desktop_app.py` | 296 |
 | `desktop_final.py` | 260 |
 | `docs/ATTACHMENTS_SPEC_UA.md` | 24 |
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
@@ -52,4 +52,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9426 рядків**
+**РАЗОМ: 9485 рядків**
