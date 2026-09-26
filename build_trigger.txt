@@ -1,3 +1,4 @@
 Windows release build trigger for 1.0.1
 Icon: ico.png
 Build requested: 2026-09-26
+Final verification trigger: comparison tests + icon + Ukrainian installer
