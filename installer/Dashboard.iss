@@ -17,6 +17,9 @@ WizardStyle=modern
 PrivilegesRequired=admin
 Uninstallable=yes
 
+[Languages]
+Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
+
 [Files]
 Source: "..\dist\Dashboard_1.0.1.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion
