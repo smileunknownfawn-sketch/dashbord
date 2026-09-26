@@ -15,6 +15,7 @@
 | `README.md` | 32 |
 | `app.js` | 34 |
 | `app_v3.py` | 540 |
+| `build_trigger.txt` | 1 |
 | `core/__init__.py` | 1 |
 | `core/analytics.py` | 121 |
 | `core/attachments.py` | 39 |
@@ -60,4 +61,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10376 рядків**
+**РАЗОМ: 10377 рядків**
