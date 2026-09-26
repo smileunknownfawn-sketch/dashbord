@@ -21,7 +21,7 @@ jobs:
         run: python -m pip install --upgrade pip pytest pyinstaller pillow
       - name: Синтаксична перевірка
         shell: pwsh
-        run: python -m compileall -q core desktop_final.py desktop_release.py tests
+        run: python -m compileall -q core desktop_final.py desktop_modern.py desktop_release.py tests
       - name: Підготувати ресурси
         shell: pwsh
         run: |
