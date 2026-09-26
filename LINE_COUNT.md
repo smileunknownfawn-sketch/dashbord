@@ -29,6 +29,7 @@
 | `dashboard_engine.py` | 5736 |
 | `desktop_app.py` | 296 |
 | `desktop_final.py` | 260 |
+| `desktop_modern.py` | 305 |
 | `desktop_release.py` | 104 |
 | `docs/ATTACHMENTS_SPEC_UA.md` | 24 |
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
@@ -58,4 +59,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9977 рядків**
+**РАЗОМ: 10282 рядків**
