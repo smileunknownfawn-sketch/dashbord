@@ -43,6 +43,14 @@ class OrderService:
         rid=self.db.execute("INSERT INTO responses(order_id,response_date,outgoing,comment,filename,path,mime,is_final,created_at) VALUES(?,?,?,?,?,?,?,?,?)",(order["id"],response_date.isoformat(),outgoing.strip(),comment.strip(),document.name,str(document.relative_to(self.storage.paths.root)),mime,int(final),datetime.now().isoformat(timespec="seconds")));self.db.log(order["id"],"Додано відповідь",outgoing.strip() or "Без вихідного номера")
         if final:self.db.execute("UPDATE orders SET status='done',completion_outgoing=?,updated_at=? WHERE id=?",(outgoing.strip(),datetime.now().isoformat(timespec="seconds"),order["id"]));self.db.log(order["id"],"Виконано",outgoing.strip() or "Відповідь без вихідного номера")
         return rid
+    def add_attachment(self,order_id:int,source:Path,*,response_id:int=0)->int:
+        order=self.db.get_order(order_id,include_deleted=True)
+        if not order: raise ValueError("Розпорядження не знайдено")
+        if not source.exists() or not source.is_file(): raise FileNotFoundError("Файл додатка не знайдено")
+        folder=self.storage.paths.orders/order["folder"]/("Додатки" if not response_id else f"Відповіді/Відповідь_{response_id}/Додатки")
+        document=self.storage.save_bytes(folder,source.name,source.read_bytes()); mime=mimetypes.guess_type(document.name)[0] or "application/octet-stream"
+        aid=self.db.execute("INSERT INTO attachments(order_id,response_id,filename,path,mime,created_at) VALUES(?,?,?,?,?,?)",(order_id,response_id,document.name,str(document.relative_to(self.storage.paths.root)),mime,datetime.now().isoformat(timespec="seconds")));self.db.log(order_id,"Додано додаток",document.name);return aid
+    def add_response_attachment(self,order_id:int,response_id:int,source:Path)->int:return self.add_attachment(order_id,source,response_id=response_id)
     def reopen(self,order_id:int)->None:self.db.execute("UPDATE orders SET status='progress',completion_outgoing='',updated_at=? WHERE id=?",(datetime.now().isoformat(timespec="seconds"),order_id));self.db.log(order_id,"Статус змінено","Розпорядження повернуто в роботу")
     def mark_done(self,order_id:int,outgoing:str="")->None:self.db.execute("UPDATE orders SET status='done',completion_outgoing=?,updated_at=? WHERE id=?",(outgoing.strip(),datetime.now().isoformat(timespec="seconds"),order_id));self.db.log(order_id,"Виконано",outgoing.strip())
     def move_to_trash(self,order:Any)->Path:
