@@ -9,15 +9,17 @@ on:
 env:
   RELEASE_BUILD: '1.0.1'
   RELEASE_ICON: 'ico.png'
+  PYTHONUTF8: '1'
+  PYTHONIOENCODING: 'utf-8'
 
 jobs:
   test-and-build:
     runs-on: windows-latest
     steps:
       - name: Отримати код
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Встановити Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Встановити залежності
@@ -29,7 +31,8 @@ jobs:
       - name: Перевірити імпорт і аналітику
         shell: pwsh
         run: |
-          python -c "import desktop_release, launcher; from core.analytics import year_comparison, month_comparison; print('Імпорт фінального UI: OK'); print(year_comparison([], 2025, 2026)); print(month_comparison([], 2025, 1, 2026, 1))"
+          $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+          python -X utf8 -c "import desktop_release, launcher; from core.analytics import year_comparison, month_comparison; print('FINAL UI IMPORT OK'); print(year_comparison([], 2025, 2026)); print(month_comparison([], 2025, 1, 2026, 1))"
       - name: Автоматичні тести
         shell: pwsh
         run: pytest -q
@@ -40,7 +43,7 @@ jobs:
           if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg не знайдено" }
           if (!(Test-Path "sounds\opiat-rabota.mp3")) { throw "sounds/opiat-rabota.mp3 не знайдено" }
           if (!(Test-Path "ico.png")) { throw "ico.png не знайдено в корені репозиторію" }
-          python -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG'); im=Image.open('ico.png').convert('RGBA'); im.thumbnail((256,256),Image.Resampling.LANCZOS); im.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+          python -X utf8 -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG'); im=Image.open('ico.png').convert('RGBA'); im.thumbnail((256,256),Image.Resampling.LANCZOS); im.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
       - name: Зібрати EXE
         shell: pwsh
         run: |
