@@ -16,8 +16,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Встановити інструменти
-        uses: actions/checkout@v4
       - name: Встановити залежності
         shell: pwsh
         run: python -m pip install --upgrade pip pytest pyinstaller pillow
@@ -52,11 +50,11 @@ jobs:
       - name: Встановити Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
-      - name: Зібрати Setup
+      - name: Зібрати Setup з українською іконкою
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path installer\output | Out-Null
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\Dashboard.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\DashboardIcon.iss
           if (!(Test-Path "installer\output\Дашборд_розпоряджень_1.0.1_Setup.exe")) { throw "Setup не створено" }
       - name: Зберегти EXE
         uses: actions/upload-artifact@v4
