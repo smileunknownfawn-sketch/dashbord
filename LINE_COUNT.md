@@ -47,11 +47,11 @@
 | `streamlit_app.py` | 79 |
 | `styles.css` | 0 |
 | `tests/test_100_documents_smoke.py` | 27 |
-| `tests/test_core.py` | 70 |
+| `tests/test_core.py` | 118 |
 | `tests/test_final_acceptance.py` | 69 |
 | `tests/test_search_service.py` | 44 |
 | `tests/test_services.py` | 70 |
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9682 рядків**
+**РАЗОМ: 9730 рядків**
