@@ -16,7 +16,7 @@
 | `app.js` | 34 |
 | `app_v3.py` | 540 |
 | `core/__init__.py` | 1 |
-| `core/analytics.py` | 123 |
+| `core/analytics.py` | 121 |
 | `core/attachments.py` | 39 |
 | `core/backup.py` | 65 |
 | `core/config.py` | 33 |
@@ -60,4 +60,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10310 рядків**
+**РАЗОМ: 10308 рядків**
