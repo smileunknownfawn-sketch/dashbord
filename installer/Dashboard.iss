@@ -19,7 +19,7 @@ Uninstallable=yes
 
 [Files]
 Source: "..\dist\Dashboard_1.0.1.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion
+Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\assets\language_meme.png"; DestDir: "{app}\assets"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
@@ -27,6 +27,7 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 
 [UninstallDelete]
+; Робочі дані навмисно не видаляються. Вони знаходяться поза папкою програми.
 Type: filesandordirs; Name: "{app}\sounds"
 Type: filesandordirs; Name: "{app}\assets"
 
