@@ -38,6 +38,7 @@
 | `index.html` | 116 |
 | `installer/FINAL_TEST_PLAN.md` | 78 |
 | `installer/README.md` | 26 |
+| `launcher.py` | 27 |
 | `pages/2_Розширена_аналітика.py` | 169 |
 | `requirements.txt` | 5 |
 | `services/__init__.py` | 1 |
@@ -61,4 +62,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10377 рядків**
+**РАЗОМ: 10404 рядків**
