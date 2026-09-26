@@ -27,7 +27,9 @@ def inside(root: Path, candidate: Path) -> bool:
 
 
 def safe_child(root: Path, name: str) -> Path:
-    cleaned = "".join(ch if ch.isalnum() or ch in " ._-()[]" else "_" for ch in str(name).strip()) or "Документ"
+    raw = str(name).strip()
+    cleaned = "".join(ch if ch.isalnum() or ch in " ._-()[]" else "_" for ch in raw) or "Документ"
+    cleaned = cleaned.replace("..", "_").strip(" .") or "Документ"
     candidate = (root / cleaned).resolve()
     if not inside(root, candidate):
         raise ValueError("Небезпечний шлях")
