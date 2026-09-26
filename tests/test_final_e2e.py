@@ -43,7 +43,7 @@ def test_full_order_lifecycle_with_attachments_and_response(tmp_path):
     response_row = [r for r in db.get_responses(oid) if int(r["id"]) == rid][0]
     service.add_response_attachment(oid, rid, response_attachment)
     response_dir = paths.root / Path(response_row["path"]).parent
-    assert (response_dir / response_attachment.name).exists()
+    assert (response_dir / response.name).exists()
     assert (response_dir / "Додатки" / response_attachment.name).exists()
     assert service.status(db.get_order(oid)) == "done"
 
