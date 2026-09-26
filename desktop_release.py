@@ -6,11 +6,11 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from desktop_final import DesktopDashboard
+from desktop_modern import ModernDashboard
 
 
-class ReleaseDashboard(DesktopDashboard):
-    """Фінальна оболонка 1.0.1: локальні ресурси, мова та додатки."""
+class ReleaseDashboard(ModernDashboard):
+    """Фінальна оболонка 1.0.1: сучасний UI, локальні ресурси, мова та додатки."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -21,19 +21,14 @@ class ReleaseDashboard(DesktopDashboard):
         return base.joinpath(*parts)
 
     def _install_release_controls(self) -> None:
-        children = self.winfo_children()
-        anchor = children[1] if len(children) > 1 else None
-        bar = ttk.Frame(self)
-        if anchor is not None:
-            bar.pack(fill="x", padx=24, pady=(0, 6), before=anchor)
-        else:
-            bar.pack(fill="x", padx=24, pady=(0, 6))
-        ttk.Label(bar, text="Мова інтерфейсу:").pack(side="left")
-        self.language = ttk.Combobox(bar, values=["Українська", "Російська"], state="readonly", width=18)
+        bar = ttk.Frame(self.shell, style="Card.TFrame")
+        bar.pack(fill="x", padx=22, pady=(0, 8))
+        ttk.Label(bar, text="Мова інтерфейсу", style="CardTitle.TLabel").pack(side="left", padx=(14, 8), pady=9)
+        self.language = ttk.Combobox(bar, values=["Українська", "Російська"], state="readonly", width=16)
         self.language.set("Українська")
-        self.language.pack(side="left", padx=8)
+        self.language.pack(side="left", pady=6)
         self.language.bind("<<ComboboxSelected>>", self._language_changed)
-        ttk.Label(bar, text="Інтерфейс застосунку — українською", style="Muted.TLabel").pack(side="left")
+        ttk.Label(bar, text="Основна мова програми — українська", style="Muted.TLabel").pack(side="left", padx=10)
 
     def _language_changed(self, _event=None) -> None:
         if self.language.get() != "Російська":
@@ -41,7 +36,7 @@ class ReleaseDashboard(DesktopDashboard):
         win = tk.Toplevel(self)
         win.title("Мова інтерфейсу")
         win.geometry("520x500")
-        win.configure(bg="#0e1511")
+        win.configure(bg=self.BG)
         win.transient(self)
         win.grab_set()
         ttk.Label(win, text="Ти що москать?", style="Title.TLabel").pack(pady=(22, 10))
@@ -82,7 +77,7 @@ class ReleaseDashboard(DesktopDashboard):
         if not row:
             messagebox.showinfo("Додатки", "Оберіть розпорядження.")
             return
-        paths = filedialog.askopenfilenames(title="Оберіть додатки до розпорядження")
+        paths = filedialog.askopenfilenames(title="Оберіть необов'язкові додатки до розпорядження")
         errors = []
         for raw in paths:
             try:
