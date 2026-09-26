@@ -26,6 +26,9 @@ jobs:
         shell: pwsh
         run: |
           python -c "import desktop_release, launcher; from core.analytics import year_comparison, month_comparison; print('Імпорт фінального UI: OK'); print(year_comparison([], 2025, 2026)); print(month_comparison([], 2025, 1, 2026, 1))"
+      - name: Автоматичні тести
+        shell: pwsh
+        run: pytest -q
       - name: Підготувати ресурси
         shell: pwsh
         run: |
@@ -33,12 +36,13 @@ jobs:
           if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg не знайдено" }
           if (!(Test-Path "sounds\opiat-rabota.mp3")) { throw "sounds/opiat-rabota.mp3 не знайдено" }
           python -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG')"
-      - name: Автоматичні тести
-        shell: pwsh
-        run: pytest -q
+          if (Test-Path "assets\dashboard.ico") { Copy-Item "assets\dashboard.ico" "build_assets\dashboard.ico" }
       - name: Зібрати EXE
         shell: pwsh
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" launcher.py
+        run: |
+          $iconArg = @()
+          if (Test-Path "build_assets\dashboard.ico") { $iconArg = @('--icon', 'build_assets\dashboard.ico') }
+          pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" @iconArg --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" launcher.py
       - name: Перевірити EXE
         shell: pwsh
         run: |
