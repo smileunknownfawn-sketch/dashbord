@@ -22,7 +22,7 @@
 | `core/config.py` | 33 |
 | `core/database.py` | 58 |
 | `core/exports.py` | 61 |
-| `core/orders.py` | 77 |
+| `core/orders.py` | 202 |
 | `core/search_service.py` | 123 |
 | `core/storage.py` | 111 |
 | `core/ui_localization.py` | 39 |
@@ -56,4 +56,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9753 рядків**
+**РАЗОМ: 9878 рядків**
