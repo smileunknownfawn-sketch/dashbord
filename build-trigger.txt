@@ -1,0 +1,1 @@
+Final Windows build trigger for 1.0.1. Includes application icon, Ukrainian installer, selected data folder, themes/settings, analytics, attachments/replies and bundled notification sound.
