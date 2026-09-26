@@ -43,7 +43,7 @@
 | `services/notification_service.py` | 39 |
 | `services/report_service.py` | 76 |
 | `services/statistics_service.py` | 85 |
-| `services/storage_service.py` | 63 |
+| `services/storage_service.py` | 65 |
 | `streamlit_app.py` | 79 |
 | `styles.css` | 0 |
 | `tests/conftest.py` | 8 |
@@ -52,8 +52,8 @@
 | `tests/test_final_acceptance.py` | 69 |
 | `tests/test_package_imports.py` | 11 |
 | `tests/test_search_service.py` | 44 |
-| `tests/test_services.py` | 70 |
+| `tests/test_services.py` | 72 |
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9749 рядків**
+**РАЗОМ: 9753 рядків**
