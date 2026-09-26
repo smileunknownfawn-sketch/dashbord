@@ -9,7 +9,7 @@
 | `.github/workflows/final-validation.yml` | 24 |
 | `.github/workflows/tests.yml` | 24 |
 | `.github/workflows/windows-release-v2.yml` | 45 |
-| `.github/workflows/windows-release.yml` | 41 |
+| `.github/workflows/windows-release.yml` | 65 |
 | `BUILD_V3_TRIGGER.md` | 3 |
 | `FINAL_VERSION.md` | 79 |
 | `README.md` | 32 |
@@ -29,6 +29,7 @@
 | `dashboard_engine.py` | 5736 |
 | `desktop_app.py` | 296 |
 | `desktop_final.py` | 260 |
+| `desktop_release.py` | 104 |
 | `docs/ATTACHMENTS_SPEC_UA.md` | 24 |
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
 | `docs/SEARCH_SPEC_UA.md` | 26 |
@@ -53,4 +54,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9554 рядків**
+**РАЗОМ: 9682 рядків**
