@@ -17,6 +17,7 @@
 | `app_v3.py` | 540 |
 | `core/__init__.py` | 1 |
 | `core/analytics.py` | 123 |
+| `core/attachments.py` | 39 |
 | `core/backup.py` | 65 |
 | `core/config.py` | 33 |
 | `core/database.py` | 58 |
@@ -28,6 +29,7 @@
 | `dashboard_engine.py` | 5736 |
 | `desktop_app.py` | 237 |
 | `desktop_final.py` | 260 |
+| `docs/ATTACHMENTS_SPEC_UA.md` | 24 |
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
 | `docs/SEARCH_SPEC_UA.md` | 26 |
 | `index.html` | 116 |
@@ -49,4 +51,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9277 рядків**
+**РАЗОМ: 9340 рядків**
