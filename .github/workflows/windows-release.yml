@@ -21,7 +21,7 @@ jobs:
         run: python -m pip install --upgrade pip pytest pyinstaller pillow
       - name: Синтаксична перевірка
         shell: pwsh
-        run: python -m compileall -q core desktop_final.py desktop_modern.py desktop_release.py tests
+        run: python -m compileall -q core desktop_final.py desktop_modern.py desktop_release.py launcher.py tests
       - name: Підготувати ресурси
         shell: pwsh
         run: |
@@ -34,14 +34,13 @@ jobs:
         run: pytest -q
       - name: Зібрати EXE
         shell: pwsh
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" desktop_release.py
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" launcher.py
       - name: Перевірити EXE
         shell: pwsh
         run: |
           if (!(Test-Path "dist\Dashboard_1.0.1.exe")) { throw "EXE не створено" }
           $size=(Get-Item "dist\Dashboard_1.0.1.exe").Length
           if ($size -lt 100000) { throw "EXE має підозріло малий розмір" }
-          Get-Item "dist\Dashboard_1.0.1.exe" | Format-List Name,Length,FullName
       - name: Встановити Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
