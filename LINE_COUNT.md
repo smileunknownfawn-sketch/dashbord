@@ -55,6 +55,7 @@
 | `tests/test_core.py` | 118 |
 | `tests/test_file_layout.py` | 47 |
 | `tests/test_final_acceptance.py` | 61 |
+| `tests/test_final_e2e.py` | 65 |
 | `tests/test_order_filesystem_flow.py` | 52 |
 | `tests/test_package_imports.py` | 11 |
 | `tests/test_search_service.py` | 44 |
@@ -63,4 +64,4 @@
 | `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10395 рядків**
+**РАЗОМ: 10460 рядків**
