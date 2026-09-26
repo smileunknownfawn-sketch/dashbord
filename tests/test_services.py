@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from services.calendar_service import DeadlineItem, deadline_label, deadline_state, days_left, month_days, upcoming, overdue
 from services.notification_service import build_notifications, counts
@@ -6,11 +6,13 @@ from services.report_service import summarize, by_month, completion_by_month
 
 
 def test_deadline_calculations():
-    today = date(2026, 9, 25)
-    assert days_left("2026-09-25", today) == 0
-    assert deadline_label("2026-09-25", today) == "Термін сьогодні"
-    assert deadline_state("2026-09-24") == "overdue"
-    assert deadline_state("2026-09-26") == "soon"
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    yesterday = today - timedelta(days=1)
+    assert days_left(today.isoformat(), today) == 0
+    assert deadline_label(today.isoformat(), today) == "Термін сьогодні"
+    assert deadline_state(yesterday.isoformat()) == "overdue"
+    assert deadline_state(tomorrow.isoformat()) == "soon"
 
 
 def test_calendar_month():
