@@ -6,6 +6,10 @@ on:
     branches: [main, build-final-1.0.1]
     tags: ['v*']
 
+env:
+  RELEASE_BUILD: '1.0.1'
+  RELEASE_ICON: 'ico.png'
+
 jobs:
   test-and-build:
     runs-on: windows-latest
