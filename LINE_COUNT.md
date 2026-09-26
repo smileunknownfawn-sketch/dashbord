@@ -33,6 +33,7 @@
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
 | `docs/SEARCH_SPEC_UA.md` | 26 |
 | `index.html` | 116 |
+| `installer/FINAL_TEST_PLAN.md` | 78 |
 | `installer/README.md` | 26 |
 | `pages/2_Розширена_аналітика.py` | 169 |
 | `requirements.txt` | 5 |
@@ -51,4 +52,4 @@
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 9340 рядків**
+**РАЗОМ: 9418 рядків**
