@@ -60,6 +60,7 @@
 | `tests/test_search_service.py` | 44 |
 | `tests/test_services.py` | 72 |
 | `tests/test_storage_and_statistics.py` | 40 |
+| `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10315 рядків**
+**РАЗОМ: 10395 рядків**
