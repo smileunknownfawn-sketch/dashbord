@@ -20,8 +20,10 @@
 | `core/database.py` | 58 |
 | `core/exports.py` | 61 |
 | `core/orders.py` | 69 |
+| `core/search_service.py` | 123 |
 | `core/storage.py` | 111 |
 | `dashboard_engine.py` | 5736 |
+| `docs/SEARCH_SPEC_UA.md` | 26 |
 | `index.html` | 116 |
 | `pages/2_Розширена_аналітика.py` | 169 |
 | `requirements.txt` | 5 |
@@ -34,8 +36,9 @@
 | `streamlit_app.py` | 79 |
 | `styles.css` | 0 |
 | `tests/test_core.py` | 70 |
+| `tests/test_search_service.py` | 44 |
 | `tests/test_services.py` | 70 |
 | `tests/test_storage_and_statistics.py` | 40 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 8360 рядків**
+**РАЗОМ: 8553 рядків**
