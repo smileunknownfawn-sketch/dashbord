@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Встановити інструменти
+        uses: actions/checkout@v4
+      - name: Встановити залежності
         shell: pwsh
         run: python -m pip install --upgrade pip pytest pyinstaller pillow
       - name: Синтаксична перевірка
@@ -29,20 +31,18 @@ jobs:
       - name: Автоматичні тести
         shell: pwsh
         run: pytest -q
-      - name: Підготувати ресурси
+      - name: Підготувати ресурси та іконку
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build_assets\assets | Out-Null
           if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg не знайдено" }
           if (!(Test-Path "sounds\opiat-rabota.mp3")) { throw "sounds/opiat-rabota.mp3 не знайдено" }
-          python -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG')"
-          if (Test-Path "assets\dashboard.ico") { Copy-Item "assets\dashboard.ico" "build_assets\dashboard.ico" }
+          if (!(Test-Path "ico.png")) { throw "ico.png не знайдено в корені репозиторію" }
+          python -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG'); im=Image.open('ico.png').convert('RGBA'); im.thumbnail((256,256),Image.Resampling.LANCZOS); im.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
       - name: Зібрати EXE
         shell: pwsh
         run: |
-          $iconArg = @()
-          if (Test-Path "build_assets\dashboard.ico") { $iconArg = @('--icon', 'build_assets\dashboard.ico') }
-          pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" @iconArg --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" launcher.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --icon "build_assets\dashboard.ico" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" --add-data "build_assets/dashboard.ico;assets" launcher.py
       - name: Перевірити EXE
         shell: pwsh
         run: |
