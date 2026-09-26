@@ -6,6 +6,10 @@ from datetime import date, datetime
 from typing import Any, Iterable
 
 DONE = {"done", "виконано", "Виконано", "completed"}
+MONTHS_UA = [
+    "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
+    "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень",
+]
 
 
 def _date(value: Any):
