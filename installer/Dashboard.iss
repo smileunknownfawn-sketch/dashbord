@@ -19,8 +19,8 @@ Uninstallable=yes
 
 [Files]
 Source: "..\dist\Dashboard_1.0.1.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "..\assets\language_meme.png"; DestDir: "{app}\assets"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion
+Source: "..\language-russian.jpg"; DestDir: "{app}\assets"; DestName: "language-russian.jpg"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
