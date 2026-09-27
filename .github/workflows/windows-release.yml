@@ -2,6 +2,8 @@ name: Windows release 1.0.1
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   push:
     branches: [main, build-final-1.0.1]
     tags: ['v*']
