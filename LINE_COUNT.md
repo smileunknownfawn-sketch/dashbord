@@ -19,7 +19,7 @@
 | `build-trigger.txt` | 0 |
 | `build_trigger.txt` | 4 |
 | `core/__init__.py` | 1 |
-| `core/analytics.py` | 182 |
+| `core/analytics.py` | 126 |
 | `core/attachments.py` | 39 |
 | `core/backup.py` | 65 |
 | `core/config.py` | 33 |
@@ -67,4 +67,4 @@
 | `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10610 рядків**
+**РАЗОМ: 10554 рядків**
