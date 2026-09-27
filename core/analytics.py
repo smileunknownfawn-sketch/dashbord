@@ -40,6 +40,11 @@ class Metrics:
     completion_rate: float
     overdue_rate: float
 
+    @property
+    def today(self) -> int:
+        """Backward-compatible alias used by existing UI/tests."""
+        return self.due_today
+
 
 def metrics(rows: Iterable[Any], anchor: date | None = None) -> Metrics:
     values = list(rows)
@@ -80,80 +85,36 @@ def monthly(rows: Iterable[Any], year: int) -> list[dict[str, int]]:
         due = _date(row["deadline"] if hasattr(row, "keys") else row.get("deadline"))
         if status in DONE:
             bucket["виконано"] += 1
-        elif due and due < today:
-            bucket["прострочено"] += 1
         else:
             bucket["у_роботі"] += 1
-    return [{"month": m, **buckets[m]} for m in range(1, 13)]
+            if due and due < today:
+                bucket["прострочено"] += 1
+    return [dict(month=month, **buckets[month]) for month in range(1, 13)]
 
 
-def distribution(rows: Iterable[Any], field: str, fallback: str = "Не вказано") -> dict[str, int]:
-    counter: Counter[str] = Counter()
+def distribution(rows: Iterable[Any], field: str) -> dict[str, int]:
+    values = []
     for row in rows:
-        try:
-            value = row[field]
-        except (KeyError, TypeError):
-            value = None
-        counter[str(value or fallback).strip()] += 1
-    return dict(counter.most_common())
+        value = row[field] if hasattr(row, "keys") else row.get(field)
+        value = str(value or "Не вказано").strip() or "Не вказано"
+        values.append(value)
+    return dict(Counter(values))
 
 
-def responsible_table(rows: Iterable[Any]) -> list[dict[str, Any]]:
-    groups: dict[str, list[Any]] = defaultdict(list)
-    for row in rows:
-        name = str(row["responsible"] or "Не вказано") if hasattr(row, "keys") else str(row.get("responsible") or "Не вказано")
-        groups[name].append(row)
-    result = []
-    today = date.today()
-    for name, items in sorted(groups.items(), key=lambda pair: len(pair[1]), reverse=True):
-        total = len(items)
-        done = sum(_status(x["status"] if hasattr(x, "keys") else x.get("status")) in DONE for x in items)
-        overdue = 0
-        for x in items:
-            due = _date(x["deadline"] if hasattr(x, "keys") else x.get("deadline"))
-            st = _status(x["status"] if hasattr(x, "keys") else x.get("status"))
-            overdue += bool(due and due < today and st not in DONE)
-        result.append({"відповідальний": name, "усього": total, "виконано": done, "у_роботі": total - done, "прострочено": overdue, "відсоток": round(done / total * 100, 1) if total else 0})
-    return result
-
-
-def workload_index(rows: Iterable[Any]) -> float:
+def year_comparison(rows: Iterable[Any], year_a: int, year_b: int) -> dict[str, int]:
     values = list(rows)
-    if not values:
-        return 0.0
-    m = metrics(values)
-    return round(m.active + m.overdue * 2 + m.urgent * 1.5, 1)
+    count_a = sum(1 for row in values if (_date(row["received_date"] if hasattr(row, "keys") else row.get("received_date")) or date.min).year == year_a)
+    count_b = sum(1 for row in values if (_date(row["received_date"] if hasattr(row, "keys") else row.get("received_date")) or date.min).year == year_b)
+    return {"year_a": count_a, "year_b": count_b, "difference": count_b - count_a}
 
 
-def response_rate(rows: Iterable[Any], responses: Iterable[Any]) -> float:
-    order_ids = {r["id"] for r in rows}
-    answered = {r["order_id"] for r in responses if r["order_id"] in order_ids}
-    return round(len(answered) / len(order_ids) * 100, 1) if order_ids else 0.0
-
-
-def category_counts(rows: Iterable[Any]) -> dict[str, int]:
-    return distribution(rows, "category", "Інше")
-
-
-def responsible_counts(rows: Iterable[Any]) -> dict[str, int]:
-    return distribution(rows, "responsible", "Не визначено")
-
-
-def monthly_received(rows: Iterable[Any], year: int) -> list[int]:
-    return [x["отримано"] for x in monthly(rows, year)]
-
-
-def monthly_completed(rows: Iterable[Any], year: int) -> list[int]:
-    return [x["виконано"] for x in monthly(rows, year)]
-
-
-def monthly_deadlines(rows: Iterable[Any], year: int) -> list[int]:
-    result = [0] * 12
-    for row in rows:
-        d = _date(row["deadline"] if hasattr(row, "keys") else row.get("deadline"))
-        if d and d.year == year:
-            result[d.month - 1] += 1
-    return result
+def month_comparison(rows: Iterable[Any], year_a: int, month_a: int, year_b: int, month_b: int) -> dict[str, int]:
+    values = list(rows)
+    def count(year: int, month: int) -> int:
+        return sum(1 for row in values if (d := _date(row["received_date"] if hasattr(row, "keys") else row.get("received_date"))) and d.year == year and d.month == month)
+    first = count(year_a, month_a)
+    second = count(year_b, month_b)
+    return {"first": first, "second": second, "difference": second - first}
 
 
 def available_years(rows: Iterable[Any]) -> list[int]:
@@ -162,21 +123,4 @@ def available_years(rows: Iterable[Any]) -> list[int]:
         d = _date(row["received_date"] if hasattr(row, "keys") else row.get("received_date"))
         if d:
             years.add(d.year)
-    years.add(date.today().year)
-    return sorted(years, reverse=True)
-
-
-def yearly_received(rows: Iterable[Any]) -> dict[int, int]:
-    return {y: sum(monthly_received(rows, y)) for y in available_years(rows)}
-
-
-def year_comparison(rows: Iterable[Any], year_a: int, year_b: int) -> dict[str, int]:
-    a = sum(monthly_received(rows, year_a))
-    b = sum(monthly_received(rows, year_b))
-    return {"year_a": a, "year_b": b, "difference": b - a}
-
-
-def month_comparison(rows: Iterable[Any], year_a: int, month_a: int, year_b: int, month_b: int) -> dict[str, int]:
-    a = monthly_received(rows, year_a)[month_a - 1]
-    b = monthly_received(rows, year_b)[month_b - 1]
-    return {"first": a, "second": b, "difference": b - a}
+    return sorted(years)
