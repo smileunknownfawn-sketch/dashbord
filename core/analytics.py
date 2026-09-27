@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Iterable
@@ -49,7 +49,6 @@ def metrics(rows: Iterable[Any], anchor: date | None = None) -> Metrics:
         due = _date(_value(row, "deadline"))
         if due:
             overdue += due < anchor and status not in DONE
-            # "today" means active items due today; completed items are no longer pending.
             due_today += due == anchor and status not in DONE
         urgent += str(_value(row, "priority", "")).strip() in {"Терміновий", "Критичний"}
     active = total - completed
@@ -94,3 +93,42 @@ def available_years(rows: Iterable[Any]) -> list[int]:
         d = _date(_value(row, "received_date"))
         if d: years.add(d.year)
     return sorted(years)
+
+
+def response_rate(rows: Iterable[Any]) -> float:
+    """Return the share of orders that have a recorded response/reply."""
+    values = list(rows)
+    if not values:
+        return 0.0
+    responded = 0
+    for row in values:
+        response = _value(row, "response")
+        response_date = _value(row, "response_date")
+        response_id = _value(row, "response_id")
+        responses = _value(row, "responses")
+        if response or response_date or response_id or responses:
+            responded += 1
+    return round(responded / len(values) * 100, 1)
+
+
+def responsible_table(rows: Iterable[Any]) -> list[dict[str, Any]]:
+    """Aggregate order metrics by responsible person for the analytics table."""
+    buckets: dict[str, dict[str, int]] = defaultdict(lambda: {"total": 0, "completed": 0, "overdue": 0, "active": 0})
+    anchor = date.today()
+    for row in rows:
+        name = str(_value(row, "responsible", "Не вказано") or "Не вказано").strip() or "Не вказано"
+        bucket = buckets[name]
+        bucket["total"] += 1
+        status = _status(_value(row, "status"))
+        if status in DONE:
+            bucket["completed"] += 1
+        else:
+            bucket["active"] += 1
+            due = _date(_value(row, "deadline"))
+            if due and due < anchor:
+                bucket["overdue"] += 1
+    result = []
+    for name, values in sorted(buckets.items(), key=lambda item: (-item[1]["total"], item[0].lower())):
+        total = values["total"]
+        result.append({"responsible": name, **values, "completion_rate": round(values["completed"] / total * 100, 1) if total else 0.0})
+    return result
