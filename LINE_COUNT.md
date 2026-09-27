@@ -13,6 +13,7 @@
 | `BUILD_V3_TRIGGER.md` | 3 |
 | `FINAL_VERSION.md` | 79 |
 | `README.md` | 32 |
+| `WINDOWS_BUILD_TRIGGER.txt` | 0 |
 | `app.js` | 34 |
 | `app_v3.py` | 540 |
 | `build-trigger.txt` | 0 |
