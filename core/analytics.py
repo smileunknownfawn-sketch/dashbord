@@ -49,7 +49,8 @@ def metrics(rows: Iterable[Any], anchor: date | None = None) -> Metrics:
         due = _date(_value(row, "deadline"))
         if due:
             overdue += due < anchor and status not in DONE
-            due_today += due == anchor
+            # "today" means active items due today; completed items are no longer pending.
+            due_today += due == anchor and status not in DONE
         urgent += str(_value(row, "priority", "")).strip() in {"Терміновий", "Критичний"}
     active = total - completed
     return Metrics(total, completed, active, overdue, due_today, urgent, round(completed / total * 100, 1) if total else 0.0, round(overdue / total * 100, 1) if total else 0.0)
@@ -69,38 +70,27 @@ def monthly(rows: Iterable[Any], year: int) -> list[dict[str, int]]:
 
 
 def distribution(rows: Iterable[Any], field: str) -> dict[str, int]:
-    c = Counter(str(_value(row, field, "Не вказано") or "Не вказано").strip() or "Не вказано" for row in rows); return dict(c)
-
-
-def responsible_table(rows: Iterable[Any]) -> list[dict[str, Any]]:
-    data = {}
-    for row in rows:
-        name = str(_value(row, "responsible", "Не визначено") or "Не визначено").strip()
-        item = data.setdefault(name, {"responsible": name, "total": 0, "completed": 0, "overdue": 0}); item["total"] += 1
-        status = _status(_value(row, "status")); item["completed"] += status in DONE
-        due = _date(_value(row, "deadline")); item["overdue"] += bool(due and due < date.today() and status not in DONE)
-    result = []
-    for item in data.values():
-        x = dict(item); x["completion_rate"] = round(x["completed"] / x["total"] * 100, 1) if x["total"] else 0.0; result.append(x)
-    return sorted(result, key=lambda x: (-x["total"], x["responsible"]))
-
-
-def response_rate(rows: Iterable[Any]) -> float:
-    values = list(rows)
-    if not values: return 0.0
-    answered = sum(bool(_value(row, "response") or _value(row, "response_files")) for row in values)
-    return round(answered / len(values) * 100, 1)
+    return dict(Counter(str(_value(row, field, "Не вказано") or "Не вказано").strip() or "Не вказано" for row in rows))
 
 
 def year_comparison(rows: Iterable[Any], year_a: int, year_b: int) -> dict[str, int]:
-    values = list(rows); a = sum(1 for r in values if (d := _date(_value(r, "received_date"))) and d.year == year_a); b = sum(1 for r in values if (d := _date(_value(r, "received_date"))) and d.year == year_b); return {"year_a": a, "year_b": b, "difference": b - a}
+    values = list(rows)
+    count_a = sum(1 for row in values if (_date(_value(row, "received_date")) or date.min).year == year_a)
+    count_b = sum(1 for row in values if (_date(_value(row, "received_date")) or date.min).year == year_b)
+    return {"year_a": count_a, "year_b": count_b, "difference": count_b - count_a}
 
 
 def month_comparison(rows: Iterable[Any], year_a: int, month_a: int, year_b: int, month_b: int) -> dict[str, int]:
     values = list(rows)
-    def count(y, m): return sum(1 for r in values if (d := _date(_value(r, "received_date"))) and d.year == y and d.month == m)
-    a, b = count(year_a, month_a), count(year_b, month_b); return {"first": a, "second": b, "difference": b - a}
+    def count(year: int, month: int) -> int:
+        return sum(1 for row in values if (d := _date(_value(row, "received_date"))) and d.year == year and d.month == month)
+    first, second = count(year_a, month_a), count(year_b, month_b)
+    return {"first": first, "second": second, "difference": second - first}
 
 
 def available_years(rows: Iterable[Any]) -> list[int]:
-    return sorted({d.year for r in rows if (d := _date(_value(r, "received_date")))})
+    years = set()
+    for row in rows:
+        d = _date(_value(row, "received_date"))
+        if d: years.add(d.year)
+    return sorted(years)
