@@ -34,6 +34,7 @@
 | `desktop_final.py` | 260 |
 | `desktop_modern.py` | 305 |
 | `desktop_release.py` | 146 |
+| `desktop_release_v2.py` | 136 |
 | `docs/ATTACHMENTS_SPEC_UA.md` | 24 |
 | `docs/FINAL_UI_CHECKLIST.md` | 49 |
 | `docs/SEARCH_SPEC_UA.md` | 26 |
@@ -67,4 +68,4 @@
 | `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10562 рядків**
+**РАЗОМ: 10698 рядків**
