@@ -1,0 +1,1 @@
+Full release build: themes, settings, language selector, Russian image, analytics, icon, sound, Setup.
