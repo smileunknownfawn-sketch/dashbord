@@ -1,0 +1,1 @@
+Full fixes build: theme selector, settings, installation folder selection, data folder selection, clearer UI, uncropped Russian-language image and full-screen image viewer.
