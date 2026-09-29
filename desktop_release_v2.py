@@ -6,23 +6,25 @@ import tkinter as tk
 from tkinter import ttk
 
 try:
-    from PIL import Image, ImageTk
+    from PIL import Image, ImageTk, ImageOps
 except Exception:
     Image = None
     ImageTk = None
+    ImageOps = None
 
 from desktop_release import ReleaseDashboard
 
 
 class FullReleaseDashboard(ReleaseDashboard):
-    """Final release wrapper with a real language-selection gate and Russian-language image."""
+    """Final release wrapper with a clear language gate and full-image Russian preview."""
 
     def __init__(self) -> None:
         self.language = "Українська"
         self._language_photo = None
+        self._language_source_image = None
         super().__init__()
         self.withdraw()
-        self.after(50, self._show_language_gate)
+        self.after(80, self._show_language_gate)
 
     @property
     def _language_settings_file(self) -> Path:
@@ -45,9 +47,7 @@ class FullReleaseDashboard(ReleaseDashboard):
                 data = json.loads(self._language_settings_file.read_text(encoding="utf-8"))
             data["language"] = self.language
             self._language_settings_file.parent.mkdir(parents=True, exist_ok=True)
-            self._language_settings_file.write_text(
-                json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-            )
+            self._language_settings_file.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
         except Exception:
             pass
 
@@ -55,76 +55,74 @@ class FullReleaseDashboard(ReleaseDashboard):
         self.language = self._load_saved_language()
         win = tk.Toplevel(self)
         win.title("Мова / Язык")
-        win.geometry("760x620")
-        win.resizable(False, False)
+        win.geometry("1180x820")
+        win.minsize(980, 700)
+        win.resizable(True, True)
         win.transient(self)
         win.grab_set()
         win.configure(bg="#0b1110")
 
-        title = tk.Label(
-            win,
-            text="ОБЕРІТЬ МОВУ / ВЫБЕРИТЕ ЯЗЫК",
-            bg="#0b1110",
-            fg="#eef5f0",
-            font=("Segoe UI", 20, "bold"),
-        )
-        title.pack(pady=(24, 12))
-
-        subtitle = tk.Label(
-            win,
-            text="Мова інтерфейсу / Язык интерфейса",
-            bg="#0b1110",
-            fg="#9aada1",
-            font=("Segoe UI", 10),
-        )
-        subtitle.pack(pady=(0, 16))
+        outer = tk.Frame(win, bg="#0b1110")
+        outer.pack(fill="both", expand=True)
+        tk.Label(outer, text="ОБЕРІТЬ МОВУ / ВЫБЕРИТЕ ЯЗЫК", bg="#0b1110", fg="#eef5f0",
+                 font=("Segoe UI Variable", 25, "bold")).pack(pady=(20, 8))
+        tk.Label(outer, text="Мова інтерфейсу / Язык интерфейса", bg="#0b1110", fg="#9aada1",
+                 font=("Segoe UI Variable", 12)).pack(pady=(0, 12))
 
         choice = tk.StringVar(value=self.language)
-        buttons = ttk.Frame(win)
-        buttons.pack(pady=8)
-        ttk.Radiobutton(buttons, text="Українська", value="Українська", variable=choice).pack(side="left", padx=18)
-        ttk.Radiobutton(buttons, text="Русский", value="Русский", variable=choice).pack(side="left", padx=18)
+        selector = ttk.Frame(outer)
+        selector.pack(pady=8)
+        ttk.Radiobutton(selector, text="Українська", value="Українська", variable=choice).pack(side="left", padx=24)
+        ttk.Radiobutton(selector, text="Русский", value="Русский", variable=choice).pack(side="left", padx=24)
 
-        image_frame = tk.Frame(win, bg="#111a17", width=680, height=390, highlightthickness=1, highlightbackground="#2b4035")
-        image_frame.pack(padx=24, pady=18, fill="both", expand=True)
-        image_frame.pack_propagate(False)
+        image_frame = tk.Frame(outer, bg="#050806", highlightthickness=1, highlightbackground="#2b4035")
+        image_frame.pack(fill="both", expand=True, padx=22, pady=14)
+        image_label = tk.Label(image_frame, bg="#050806", fg="#9aada1", bd=0)
+        image_label.pack(fill="both", expand=True, padx=6, pady=6)
 
-        image_label = tk.Label(image_frame, bg="#111a17", fg="#9aada1", text="")
-        image_label.pack(fill="both", expand=True, padx=8, pady=8)
+        def source_path() -> Path:
+            p = self._resource("assets", "moskal.png")
+            if not p.exists(): p = self._resource("assets", "language-russian.jpg")
+            if not p.exists(): p = self._resource("language-russian.jpg")
+            return p
 
-        def show_language_image(*_args) -> None:
+        def render_image(_event=None) -> None:
             image_label.configure(image="", text="")
             self._language_photo = None
+            self._language_source_image = None
             if choice.get() != "Русский":
-                image_label.configure(text="Українська мова\n\nЛокальний автономний режим", font=("Segoe UI", 18, "bold"), fg="#66d39a")
+                image_label.configure(text="Українська мова\n\nЛокальний автономний режим",
+                                      font=("Segoe UI Variable", 22, "bold"), fg="#66d39a")
                 return
-            image_path = self._resource("assets", "moskal.png")
-            if not image_path.exists():
-                image_path = self._resource("assets", "language-russian.jpg")
-            if Image is not None and ImageTk is not None and image_path.exists():
-                try:
-                    img = Image.open(image_path).convert("RGB")
-                    img.thumbnail((650, 360), Image.Resampling.LANCZOS)
-                    self._language_photo = ImageTk.PhotoImage(img)
-                    image_label.configure(image=self._language_photo, text="")
-                    return
-                except Exception:
-                    pass
-            image_label.configure(text="Зображення для російської мови недоступне", font=("Segoe UI", 14), fg="#df746d")
+            path = source_path()
+            if Image is None or ImageTk is None or ImageOps is None or not path.exists():
+                image_label.configure(text="Не вдалося завантажити зображення мови",
+                                      font=("Segoe UI Variable", 16), fg="#df746d")
+                return
+            try:
+                self._language_source_image = Image.open(path).convert("RGB")
+                w = max(100, image_label.winfo_width() - 12)
+                h = max(100, image_label.winfo_height() - 12)
+                fitted = ImageOps.contain(self._language_source_image, (w, h), Image.Resampling.LANCZOS)
+                canvas = Image.new("RGB", (w, h), "#050806")
+                canvas.paste(fitted, ((w-fitted.width)//2, (h-fitted.height)//2))
+                self._language_photo = ImageTk.PhotoImage(canvas)
+                image_label.configure(image=self._language_photo)
+            except Exception:
+                image_label.configure(text="Не вдалося відкрити зображення",
+                                      font=("Segoe UI Variable", 16), fg="#df746d")
 
-        choice.trace_add("write", show_language_image)
-        show_language_image()
+        image_label.bind("<Configure>", render_image)
+        choice.trace_add("write", lambda *_: render_image())
+        win.after(100, render_image)
 
         def accept() -> None:
             self.language = choice.get()
             self._save_language()
-            win.grab_release()
-            win.destroy()
-            self.deiconify()
-            self.lift()
-            self.focus_force()
+            win.grab_release(); win.destroy()
+            self.deiconify(); self.lift(); self.focus_force()
 
-        ttk.Button(win, text="Продовжити", command=accept).pack(pady=(0, 24), ipadx=20, ipady=5)
+        ttk.Button(outer, text="Продовжити", command=accept).pack(pady=(0, 20), ipadx=35, ipady=7)
         win.protocol("WM_DELETE_WINDOW", accept)
 
 
@@ -132,5 +130,4 @@ def main() -> None:
     FullReleaseDashboard().mainloop()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
