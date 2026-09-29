@@ -7,17 +7,20 @@ AppId={{A1D7A0D1-0101-4010-9A01-DASHBOARD2026}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher="В.О.М."
-DefaultDirName={autopf}\{#AppName}
+DefaultDirName={localappdata}\{#AppName}
+DisableDirPage=no
+CreateAppDir=yes
 DefaultGroupName={#AppName}
 OutputDir=output
 OutputBaseFilename=Дашборд_розпоряджень_1.0.1_Setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 Uninstallable=yes
-DisableProgramGroupPage=yes
+DisableProgramGroupPage=no
 SetupIconFile=..\build_assets\dashboard.ico
+ArchitecturesInstallIn64BitMode=x64
 
 [Languages]
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
@@ -47,8 +50,8 @@ procedure InitializeWizard;
 begin
   DataDirPage := CreateInputDirPage(wpSelectDir,
     'Папка для даних розпоряджень',
-    'Оберіть, де зберігати розпорядження та всі пов’язані дані',
-    'У цій папці програма створить базу, розпорядження, додатки, відповіді, резервні копії та звіти.',
+    'Оберіть окрему папку для даних програми',
+    'У вибраній папці будуть зберігатися база, розпорядження, додатки, відповіді, резервні копії та звіти. Ця папка НЕ видаляється під час видалення програми.',
     False, 'Дашборд розпоряджень');
   DataDirPage.Add('Папка даних:');
   DataDirPage.Values[0] := ExpandConstant('{userdocs}\Дашборд розпоряджень');
