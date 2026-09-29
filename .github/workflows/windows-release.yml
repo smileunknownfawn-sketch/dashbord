@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, build-final-1.0.1]
+    branches: [main, build-final-1.0.1, full-release-1.0.1]
     tags: ['v*']
 
 env:
@@ -45,21 +45,19 @@ jobs:
           if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg не знайдено" }
           if (!(Test-Path "sounds\opiat-rabota.mp3")) { throw "sounds/opiat-rabota.mp3 не знайдено" }
           if (!(Test-Path "ico.png")) { throw "ico.png не знайдено в корені репозиторію" }
-          python -X utf8 -c "from PIL import Image; Image.open('language-russian.jpg').convert('RGB').save('build_assets/assets/moskal.png', 'PNG'); im=Image.open('ico.png').convert('RGBA'); im.thumbnail((256,256),Image.Resampling.LANCZOS); im.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+          python -X utf8 -c "from PIL import Image; im=Image.open('language-russian.jpg').convert('RGB'); im.thumbnail((1600,1000),Image.Resampling.LANCZOS); im.save('build_assets/assets/moskal.png','PNG'); icon=Image.open('ico.png').convert('RGBA'); icon.thumbnail((256,256),Image.Resampling.LANCZOS); icon.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
       - name: Зібрати EXE
         shell: pwsh
-        run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --icon "build_assets\dashboard.ico" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" --add-data "language-russian.jpg;assets" --add-data "build_assets/dashboard.ico;assets" launcher.py
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.0.1" --icon "build_assets\dashboard.ico" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" --add-data "language-russian.jpg;assets" --add-data "build_assets/dashboard.ico;assets" launcher.py
       - name: Перевірити EXE
         shell: pwsh
         run: |
           if (!(Test-Path "dist\Dashboard_1.0.1.exe")) { throw "EXE не створено" }
-          $size=(Get-Item "dist\Dashboard_1.0.1.exe").Length
-          if ($size -lt 100000) { throw "EXE має підозріло малий розмір" }
+          if ((Get-Item "dist\Dashboard_1.0.1.exe").Length -lt 100000) { throw "EXE має підозріло малий розмір" }
       - name: Встановити Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
-      - name: Зібрати Setup з українською іконкою
+      - name: Зібрати Setup
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path installer\output | Out-Null
