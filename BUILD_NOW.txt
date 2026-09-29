@@ -1,0 +1,1 @@
+Trigger Windows full release build with installer fixes.
