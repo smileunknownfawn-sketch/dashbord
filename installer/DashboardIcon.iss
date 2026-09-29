@@ -33,7 +33,7 @@ Source: "..\language-russian.jpg"; DestDir: "{app}\assets"; DestName: "language-
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
-Name: "{autodesktop}\{AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sounds"
