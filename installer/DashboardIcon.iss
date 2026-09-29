@@ -1,18 +1,18 @@
 #define AppName "Дашборд розпоряджень"
-#define AppVersion "1.0.1"
-#define AppExeName "Dashboard_1.0.1.exe"
+#define AppVersion "1.1.0"
+#define AppExeName "Dashboard_1.1.0.exe"
 
 [Setup]
 AppId={{A1D7A0D1-0101-4010-9A01-DASHBOARD2026}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher="В.О.М."
-DefaultDirName={localappdata}\{#AppName}
+DefaultDirName={localappdata}\{#AppName} {#AppVersion}
 DisableDirPage=no
 CreateAppDir=yes
 DefaultGroupName={#AppName}
 OutputDir=output
-OutputBaseFilename=Дашборд_розпоряджень_1.0.1_Setup
+OutputBaseFilename=Дашборд_розпоряджень_1.1.0_Setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -26,7 +26,7 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Files]
-Source: "..\dist\Dashboard_1.0.1.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\Dashboard_1.1.0.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\build_assets\dashboard.ico"; DestDir: "{app}\assets"; Flags: ignoreversion
 Source: "..\sounds\opiat-rabota.mp3"; DestDir: "{app}\sounds"; Flags: ignoreversion
 Source: "..\language-russian.jpg"; DestDir: "{app}\assets"; DestName: "language-russian.jpg"; Flags: ignoreversion
@@ -51,7 +51,7 @@ begin
   DataDirPage := CreateInputDirPage(wpSelectDir,
     'Папка для даних розпоряджень',
     'Оберіть окрему папку для даних програми',
-    'У вибраній папці будуть зберігатися база, розпорядження, додатки, відповіді, резервні копії та звіти. Ця папка НЕ видаляється під час видалення програми.',
+    'У цій папці будуть зберігатися база, розпорядження, додатки, відповіді, резервні копії та звіти. Папка НЕ видаляється під час видалення програми.',
     False, 'Дашборд розпоряджень');
   DataDirPage.Add('Папка даних:');
   DataDirPage.Values[0] := ExpandConstant('{userdocs}\Дашборд розпоряджень');

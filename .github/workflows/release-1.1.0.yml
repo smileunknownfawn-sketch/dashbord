@@ -1,74 +1,67 @@
-name: Windows release 1.1.0
+name: Dashboard 1.1.0 full Windows release
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [dashboard-max-ux-1.1.0]
   pull_request:
     branches: [main]
-  push:
-    branches: [main, build-final-1.0.1, full-release-1.0.1, dashboard-max-ux-1.1.0]
-    tags: ['v*']
+  workflow_dispatch:
 
 env:
-  RELEASE_BUILD: '1.1.0'
-  RELEASE_ICON: 'ico.png'
   PYTHONUTF8: '1'
   PYTHONIOENCODING: 'utf-8'
 
 jobs:
-  test-and-build:
+  build:
     runs-on: windows-latest
     steps:
-      - name: Отримати код
+      - name: Checkout
         uses: actions/checkout@v5
-      - name: Встановити Python
+      - name: Python 3.12
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Встановити залежності
+      - name: Dependencies
         shell: pwsh
         run: python -m pip install --upgrade pip pytest pyinstaller pillow
-      - name: Синтаксична перевірка
+      - name: Syntax check
         shell: pwsh
         run: python -m compileall -q core desktop_final.py desktop_modern.py desktop_release.py desktop_release_v2.py desktop_max.py launcher.py tests
-      - name: Перевірити імпорт і аналітику
-        shell: pwsh
-        run: |
-          $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-          python -X utf8 -c "import desktop_max, desktop_release_v2, desktop_release, launcher; from core.analytics import year_comparison, month_comparison; print('FULL RELEASE UI IMPORT OK'); print(year_comparison([], 2025, 2026)); print(month_comparison([], 2025, 1, 2026, 1))"
-      - name: Автоматичні тести
+      - name: Tests
         shell: pwsh
         run: pytest -q
-      - name: Підготувати ресурси та іконку
+      - name: Prepare assets
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build_assets\assets | Out-Null
-          if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg не знайдено" }
-          if (!(Test-Path "ico.png")) { throw "ico.png не знайдено" }
+          if (!(Test-Path "language-russian.jpg")) { throw "language-russian.jpg missing" }
+          if (!(Test-Path "ico.png")) { throw "ico.png missing" }
+          if (!(Test-Path "sounds\opiat-rabota.mp3")) { throw "sound missing" }
           python -X utf8 -c "from PIL import Image; im=Image.open('language-russian.jpg').convert('RGB'); im.thumbnail((1600,1000),Image.Resampling.LANCZOS); im.save('build_assets/assets/moskal.png','PNG'); icon=Image.open('ico.png').convert('RGBA'); icon.thumbnail((256,256),Image.Resampling.LANCZOS); icon.save('build_assets/dashboard.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
-      - name: Зібрати EXE
+      - name: Build EXE
         shell: pwsh
         run: pyinstaller --noconfirm --clean --onefile --windowed --name "Dashboard_1.1.0" --icon "build_assets\dashboard.ico" --add-data "sounds;sounds" --add-data "build_assets/assets/moskal.png;assets" --add-data "language-russian.jpg;assets" --add-data "build_assets/dashboard.ico;assets" launcher.py
-      - name: Перевірити EXE
+      - name: Verify EXE
         shell: pwsh
         run: |
-          if (!(Test-Path "dist\Dashboard_1.1.0.exe")) { throw "EXE не створено" }
-          if ((Get-Item "dist\Dashboard_1.1.0.exe").Length -lt 100000) { throw "EXE має підозріло малий розмір" }
-      - name: Встановити Inno Setup
+          if (!(Test-Path "dist\Dashboard_1.1.0.exe")) { throw "EXE missing" }
+          if ((Get-Item "dist\Dashboard_1.1.0.exe").Length -lt 100000) { throw "EXE too small" }
+      - name: Install Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
-      - name: Зібрати Setup
+      - name: Build Setup
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path installer\output | Out-Null
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\DashboardIcon.iss
-          if (!(Test-Path "installer\output\Дашборд_розпоряджень_1.1.0_Setup.exe")) { throw "Setup не створено" }
-      - name: Зберегти EXE
+          if (!(Test-Path "installer\output\Дашборд_розпоряджень_1.1.0_Setup.exe")) { throw "Setup missing" }
+      - name: Upload portable EXE
         uses: actions/upload-artifact@v4
         with:
           name: Dashbord-Windows-1.1.0
           path: dist/Dashboard_1.1.0.exe
           if-no-files-found: error
-      - name: Зберегти Setup
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: Dashbord-Setup-1.1.0

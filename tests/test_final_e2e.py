@@ -61,5 +61,5 @@ def test_full_order_lifecycle_with_attachments_and_response(tmp_path):
 
 def test_all_required_config_is_ukrainian_and_versioned():
     from core.config import APP_VERSION, DEVELOPER
-    assert APP_VERSION == "1.0.1"
+    assert APP_VERSION == "1.1.0"
     assert DEVELOPER == "В.О.М."
