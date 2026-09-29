@@ -10,6 +10,7 @@
 | `.github/workflows/tests.yml` | 24 |
 | `.github/workflows/windows-release-v2.yml` | 45 |
 | `.github/workflows/windows-release.yml` | 79 |
+| `BUILD_NOW.txt` | 1 |
 | `BUILD_V3_TRIGGER.md` | 3 |
 | `FINAL_VERSION.md` | 79 |
 | `FULL_RELEASE_BUILD_TRIGGER.md` | 1 |
@@ -72,4 +73,4 @@
 | `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10699 рядків**
+**РАЗОМ: 10700 рядків**
