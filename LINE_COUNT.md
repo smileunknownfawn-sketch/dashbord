@@ -15,6 +15,7 @@
 | `FULL_RELEASE_BUILD_TRIGGER.md` | 1 |
 | `FULL_RELEASE_BUILD_TRIGGER.txt` | 1 |
 | `FULL_RELEASE_BUILD_TRIGGER_2.txt` | 1 |
+| `FULL_RELEASE_FIX_TRIGGER.txt` | 1 |
 | `README.md` | 32 |
 | `WINDOWS_BUILD_TRIGGER.txt` | 0 |
 | `app.js` | 34 |
@@ -71,4 +72,4 @@
 | `tests/test_workflow_core.py` | 80 |
 | `tools/generate_dashboard_engine.py` | 374 |
 
-**РАЗОМ: 10698 рядків**
+**РАЗОМ: 10699 рядків**
