@@ -33,11 +33,11 @@ Source: "..\language-russian.jpg"; DestDir: "{app}\assets"; DestName: "language-
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
+Name: "{autodesktop}\{AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\assets\dashboard.ico"
 
 [UninstallDelete]
-Type: filesanddirs; Name: "{app}\sounds"
-Type: filesanddirs; Name: "{app}\assets"
+Type: filesandordirs; Name: "{app}\sounds"
+Type: filesandordirs; Name: "{app}\assets"
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Parameters: "/datafolder=""{code:DataDir}"""; Description: "Запустити {#AppName}"; Flags: nowait postinstall skipifsilent
