@@ -1,4 +1,4 @@
-"""Windows launcher for the complete 1.0.1 desktop release."""
+"""Windows launcher for the complete Dashboard 1.1.0 UX release."""
 from __future__ import annotations
 
 import sys
@@ -19,7 +19,7 @@ def main() -> None:
     if root:
         root.mkdir(parents=True, exist_ok=True)
         (Path.home() / ".vom_dashboard_root").write_text(str(root), encoding="utf-8")
-    from desktop_release_v2 import main as app_main
+    from desktop_max import main as app_main
     app_main()
 
 
