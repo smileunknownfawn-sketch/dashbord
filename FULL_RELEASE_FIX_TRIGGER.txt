@@ -1,0 +1,1 @@
+Final release UI/data/installer fixes: full Russian image, explicit install folder, separate persistent data folder, readable controls.
